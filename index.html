@@ -13,7 +13,7 @@
             word-break: keep-all;
             touch-action: auto;
         }
-        
+
         .mandalart-container {
             width: 100%;
             max-width: 1000px;
@@ -21,16 +21,12 @@
             padding: 10px;
         }
 
-        .grid-scroll-wrapper {
-            width: 100%;
-        }
-
         .mandalart-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px; 
+            gap: 4px;
             width: 100%;
-            aspect-ratio: 1 / 1; 
+            aspect-ratio: 1 / 1;
         }
 
         @media (min-width: 768px) {
@@ -64,11 +60,10 @@
             align-items: center;
             justify-content: center;
             border: 0.5px solid #cbd5e1;
-            transition: all 0.2s;
             overflow: hidden;
             position: relative;
         }
-        
+
         .editable-area {
             width: 100%;
             height: 100%;
@@ -76,12 +71,11 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-family: 'Gaegu', cursive;
-            font-size: calc(2vw + 2px); 
+            font-size: calc(2vw + 2px);
             line-height: 1.1;
             outline: none;
             word-break: break-all;
-            padding: 1px;
+            padding: 2px;
             cursor: text;
             white-space: pre-wrap;
         }
@@ -93,219 +87,171 @@
             }
         }
 
-        .editable-area:empty:before {
+        /* placeholder 표시 */
+        [contenteditable][data-placeholder]:empty:before {
             content: attr(data-placeholder);
             color: #94a3b8;
-            font-size: 0.7em; 
             font-weight: bold;
-            opacity: 0.7;
         }
 
         .editable-area:focus {
             background-color: #fffbeb;
-            z-index: 10;
         }
 
-        /* 색상 테마 */
-        .core-center { background-color: #fef08a !important; border: 1.5px solid #eab308 !important; }
-        .core-sub { background-color: #fef9c3 !important; border: 1px solid #facc15 !important; }
-        
+        .core-center {
+            background-color: #fef08a !important;
+            border: 1.5px solid #eab308 !important;
+        }
+
+        .core-sub {
+            background-color: #fef9c3 !important;
+            border: 1px solid #facc15 !important;
+        }
+
         @media print {
             .no-print { display: none !important; }
-            body { background-color: white !important; padding: 0 !important; }
-            .mandalart-grid { gap: 5px; }
-            .sub-grid { gap: 1px; padding: 1px; }
-            .editable-area { font-size: 10pt; } 
+            body { background-color: white !important; }
+            .editable-area { font-size: 10pt; }
         }
 
-        .input-buffer {
-            height: 200px;
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .input-buffer { display: block; }
-        }
-
-        /* 모달 스타일 */
+        /* 모달 */
         .modal {
             display: none;
             position: fixed;
-            z-index: 50;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background-color: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(2px);
+            z-index: 50;
         }
+
         .modal.show {
             display: flex;
-            animation: fadeIn 0.3s ease-out;
         }
+
         .modal-content {
-            background-color: white;
+            background: white;
             padding: 20px;
             border-radius: 20px;
             max-width: 600px;
             width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: center;
+            position: relative;
         }
+
         .close-btn {
             position: absolute;
             top: 10px;
             right: 20px;
-            font-size: 32px;
-            color: #666;
+            font-size: 30px;
             cursor: pointer;
-            line-height: 1;
-        }
-        .close-btn:hover { color: #000; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
+
 <body class="p-2 md:p-8">
-    <div class="mandalart-container">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
-            <div class="text-center md:text-left">
-                <h1 class="text-2xl md:text-4xl font-bold text-green-800">🎯 만다라트 계획표</h1>
-                <p class="text-green-600 text-sm md:text-lg">중심에서 시작해 목표를 확장해보세요!</p>
-            </div>
-            <div class="flex gap-2 w-full md:w-auto">
-                <!-- 예시 보기 버튼 추가 -->
-                <button onclick="openModal()" class="flex-1 md:flex-none bg-yellow-400 hover:bg-yellow-500 text-white px-5 py-2 rounded-full font-bold shadow-lg flex items-center justify-center gap-2 transition-all text-lg">
-                    <span>💡 예시 보기</span>
-                </button>
-                <button onclick="window.print()" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold shadow-lg flex items-center justify-center gap-2 transition-all text-lg">
-                    <span>저장/인쇄</span>
-                </button>
-            </div>
-        </header>
+<div class="mandalart-container">
 
-        <div class="bg-white p-2 md:p-8 rounded-xl md:rounded-3xl shadow-xl border-2 md:border-4 border-green-100 mb-6">
-            <div class="grid-scroll-wrapper">
-                <div id="mandalartContainer" class="mandalart-grid">
-                    <!-- 9개의 서브 그리드가 자바스크립트로 생성됩니다 -->
-                </div>
-            </div>
+    <!-- 헤더 -->
+    <header class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
+        <div class="text-center md:text-left">
+            <h1 class="text-2xl md:text-4xl font-bold text-green-800">
+                🎯 만다라트 계획표
+            </h1>
+
+            <!-- 한 줄 다짐 입력 영역 -->
+            <div
+                contenteditable="true"
+                class="text-green-700 text-sm md:text-lg mt-2 px-2 py-1 rounded-lg outline-none focus:bg-yellow-50"
+                data-placeholder="✍️ 한 줄 다짐을 적어보세요 (예: 나는 매일 조금씩 성장한다)"
+            ></div>
         </div>
 
-        <div class="no-print bg-white p-4 rounded-xl border border-green-200 shadow-sm italic text-gray-600 text-center text-sm md:text-lg">
-            가운데 '최종 목표'를 적고 주변에 세부 목표를 채워보세요. ✨
-        </div>
-        
-        <div class="input-buffer no-print"></div>
-    </div>
-
-    <!-- 예시 이미지 모달 -->
-    <div id="exampleModal" class="modal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 class="text-2xl font-bold text-green-800 mb-4 font-gaegu">📝 작성 예시</h2>
-            <div class="bg-gray-100 p-2 rounded-lg mb-4">
-                <img src="https://github.com/mina1130/mandalart/blob/b1dba0bb12d7e500588d305148c820875d1009cd/mandalart.JPG?raw=true" alt="만다라트 예시" class="w-full h-auto rounded-md shadow-sm">
-            </div>
-            <button onclick="closeModal()" class="mt-4 bg-green-500 text-white px-6 py-2 rounded-full font-bold hover:bg-green-600 transition-colors font-gaegu">
-                닫기
+        <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="openModal()"
+                class="flex-1 md:flex-none bg-yellow-400 hover:bg-yellow-500 text-white px-5 py-2 rounded-full font-bold shadow-lg text-lg">
+                💡 예시 보기
+            </button>
+            <button onclick="window.print()"
+                class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold shadow-lg text-lg">
+                저장/인쇄
             </button>
         </div>
+    </header>
+
+    <!-- 만다라트 -->
+    <div class="bg-white p-2 md:p-8 rounded-3xl shadow-xl border-4 border-green-100 mb-6">
+        <div id="mandalartContainer" class="mandalart-grid"></div>
     </div>
 
-    <script>
-        const container = document.getElementById('mandalartContainer');
-        const modal = document.getElementById('exampleModal');
+    <div class="no-print text-center italic text-gray-600">
+        가운데 최종 목표부터 작성해보세요 ✨
+    </div>
+</div>
 
-        function createMandalart() {
-            container.innerHTML = '';
-            
-            for (let blockIdx = 0; blockIdx < 9; blockIdx++) {
-                const subGrid = document.createElement('div');
-                subGrid.className = 'sub-grid';
-                
-                for (let cellIdx = 0; cellIdx < 9; cellIdx++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell';
-                    
-                    if (blockIdx === 4 && cellIdx === 4) cell.classList.add('core-center');
-                    else if (blockIdx === 4 || cellIdx === 4) cell.classList.add('core-sub');
+<!-- 예시 모달 -->
+<div id="exampleModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <img src="https://github.com/mina1130/mandalart/blob/b1dba0bb12d7e500588d305148c820875d1009cd/mandalart.JPG?raw=true" class="rounded">
+    </div>
+</div>
 
-                    const editable = document.createElement('div');
-                    editable.className = 'editable-area';
-                    editable.contentEditable = true;
-                    editable.inputMode = "text";
-                    
-                    if (blockIdx === 4) {
-                        if (cellIdx === 4) {
-                            editable.setAttribute('data-placeholder', '최종목표');
-                        } else {
-                            const goalNum = cellIdx < 4 ? cellIdx + 1 : cellIdx;
-                            editable.setAttribute('data-placeholder', `목표${goalNum}`);
-                        }
-                    } else if (cellIdx === 4) {
-                        const goalNum = blockIdx < 4 ? blockIdx + 1 : blockIdx;
-                        editable.setAttribute('data-placeholder', `목표${goalNum}`);
-                    }
+<script>
+const container = document.getElementById('mandalartContainer');
+const modal = document.getElementById('exampleModal');
 
-                    editable.oninput = (e) => {
-                        const val = e.target.innerText;
+function createMandalart() {
+    for (let b = 0; b < 9; b++) {
+        const sub = document.createElement('div');
+        sub.className = 'sub-grid';
 
-                        if (blockIdx === 4 && cellIdx !== 4) {
-                            syncToOuter(cellIdx, val);
-                        }
-                        else if (blockIdx !== 4 && cellIdx === 4) {
-                            syncToCenter(blockIdx, val);
-                        }
-                    };
+        for (let c = 0; c < 9; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
 
-                    editable.id = `cell-${blockIdx}-${cellIdx}`;
-                    cell.appendChild(editable);
-                    subGrid.appendChild(cell);
-                }
-                container.appendChild(subGrid);
-            }
+            if (b === 4 && c === 4) cell.classList.add('core-center');
+            else if (b === 4 || c === 4) cell.classList.add('core-sub');
+
+            const edit = document.createElement('div');
+            edit.className = 'editable-area';
+            edit.contentEditable = true;
+
+            if (b === 4 && c === 4) edit.dataset.placeholder = '최종 목표';
+            else if (b === 4 || c === 4) edit.dataset.placeholder = '목표';
+
+            edit.id = `cell-${b}-${c}`;
+
+            edit.oninput = () => sync(b, c, edit.innerText);
+
+            cell.appendChild(edit);
+            sub.appendChild(cell);
         }
+        container.appendChild(sub);
+    }
+}
 
-        function syncToOuter(targetBlockIdx, value) {
-            const targetCell = document.getElementById(`cell-${targetBlockIdx}-4`);
-            if (targetCell && targetCell.innerText !== value) {
-                targetCell.innerText = value;
-            }
-        }
+function sync(b, c, val) {
+    if (b === 4 && c !== 4) {
+        document.getElementById(`cell-${c}-4`).innerText = val;
+    }
+    if (b !== 4 && c === 4) {
+        document.getElementById(`cell-4-${b}`).innerText = val;
+    }
+}
 
-        function syncToCenter(sourceBlockIdx, value) {
-            const targetCell = document.getElementById(`cell-4-${sourceBlockIdx}`);
-            if (targetCell && targetCell.innerText !== value) {
-                targetCell.innerText = value;
-            }
-        }
+function openModal() {
+    modal.classList.add('show');
+}
 
-        // 모달 관련 함수
-        function openModal() {
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
-        }
+function closeModal(e) {
+    if (!e || e.target === modal) {
+        modal.classList.remove('show');
+    }
+}
 
-        function closeModal(event) {
-            if (!event || event.target === modal || event.target.closest('.close-btn') || event.target.tagName === 'BUTTON') {
-                modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
-            }
-        }
+createMandalart();
+</script>
 
-        createMandalart();
-    </script>
 </body>
 </html>
-
-
-

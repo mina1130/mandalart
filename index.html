@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>만다라트 목표 설정 도구</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -11,38 +11,53 @@
             font-family: 'Gaegu', cursive;
             background-color: #f0fdf4;
             word-break: keep-all;
+            touch-action: manipulation;
         }
+        
+        /* 컨테이너의 너비 제한을 풀고 패딩 최적화 */
+        .mandalart-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
         .mandalart-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 8px; /* 모바일에서 간격을 조금 줄여 공간 확보 */
             width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
         }
+
+        @media (min-width: 768px) {
+            .mandalart-grid {
+                gap: 15px;
+            }
+        }
+
         .sub-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
+            gap: 2px;
             background-color: #e2e8f0;
-            padding: 4px;
-            border-radius: 8px;
+            padding: 2px;
+            border-radius: 6px;
         }
+
         .cell {
             aspect-ratio: 1 / 1;
             background-color: white;
-            border-radius: 4px;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2px;
-            border: 1px solid #cbd5e1;
+            border: 0.5px solid #cbd5e1;
             transition: all 0.2s;
             overflow: hidden;
             position: relative;
         }
         
-        /* 텍스트 입력 영역 스타일 수정 */
+        /* 모바일에서는 폰트 크기를 조금 더 키우고 패딩 최소화 */
         .editable-area {
             width: 100%;
             height: 100%;
@@ -51,60 +66,91 @@
             justify-content: center;
             text-align: center;
             font-family: 'Gaegu', cursive;
-            font-size: 1.15rem;
-            line-height: 1.2;
+            font-size: 0.8rem; /* 모바일 기본 */
+            line-height: 1.1;
             outline: none;
             word-break: break-all;
-            padding: 4px;
+            padding: 2px;
             cursor: text;
-            white-space: pre-wrap; /* 줄바꿈 허용 */
+            white-space: pre-wrap;
         }
 
-        /* Placeholder 구현 */
+        @media (min-width: 480px) {
+            .editable-area {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .editable-area {
+                font-size: 1.2rem;
+                padding: 4px;
+            }
+        }
+
         .editable-area:empty:before {
             content: attr(data-placeholder);
             color: #cbd5e1;
-            font-size: 0.85rem;
+            font-size: 0.6rem;
+        }
+
+        @media (min-width: 768px) {
+            .editable-area:empty:before {
+                font-size: 0.85rem;
+            }
         }
 
         .editable-area:focus {
             background-color: #fffbeb;
+            z-index: 10;
         }
 
         /* 색상 테마 */
-        .core-center { background-color: #fef08a !important; border: 2px solid #eab308 !important; }
-        .core-sub { background-color: #fef9c3 !important; border: 1.5px solid #facc15 !important; }
+        .core-center { background-color: #fef08a !important; border: 1.5px solid #eab308 !important; }
+        .core-sub { background-color: #fef9c3 !important; border: 1px solid #facc15 !important; }
         
         @media print {
             .no-print { display: none !important; }
             body { background-color: white !important; padding: 0 !important; }
-            .mandalart-grid { gap: 10px; }
-            .sub-grid { gap: 2px; padding: 2px; }
-            .editable-area:focus { background-color: transparent; }
+            .mandalart-grid { gap: 5px; }
+            .sub-grid { gap: 1px; padding: 1px; }
+            .editable-area { font-size: 0.9rem; }
+        }
+
+        /* 모바일에서 입력 시 키보드가 화면을 가리는 현상 방지를 위한 여백 */
+        .input-buffer {
+            height: 300px;
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .input-buffer { display: block; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 no-print gap-4">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-green-800">🎯 만다라트 계획표</h1>
-                <p class="text-green-600 text-lg">핵심 목표를 중심으로 8가지 세부 계획을 세워보세요!</p>
+<body class="p-2 md:p-8">
+    <div class="mandalart-container">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl md:text-4xl font-bold text-green-800">🎯 만다라트 계획표</h1>
+                <p class="text-green-600 text-sm md:text-lg">모바일에서도 간편하게 목표를 관리하세요!</p>
             </div>
-            <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2 transition-all text-xl">
-                <span>PDF로 저장 / 인쇄</span>
+            <button onclick="window.print()" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-bold shadow-lg flex items-center justify-center gap-2 transition-all text-lg">
+                <span>저장/인쇄</span>
             </button>
         </header>
 
-        <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl border-4 border-green-100 mb-8">
+        <div class="bg-white p-2 md:p-8 rounded-xl md:rounded-3xl shadow-xl border-2 md:border-4 border-green-100 mb-6">
             <div id="mandalartContainer" class="mandalart-grid">
                 <!-- 9개의 서브 그리드가 자바스크립트로 생성됩니다 -->
             </div>
         </div>
 
-        <div class="no-print bg-white p-6 rounded-2xl border-2 border-green-200 shadow-sm italic text-gray-600 text-center text-lg">
-            정중앙(노란색)에 핵심 목표를 적으면 주변 8개 칸의 중앙으로 자동 복사됩니다!
+        <div class="no-print bg-white p-4 rounded-xl border border-green-200 shadow-sm italic text-gray-600 text-center text-sm md:text-lg">
+            노란색 중심 칸에 목표를 적으면 자동으로 복사됩니다! ✨
         </div>
+        
+        <!-- 모바일 스크롤 여백 -->
+        <div class="input-buffer no-print"></div>
     </div>
 
     <script>
@@ -127,21 +173,29 @@
                     const editable = document.createElement('div');
                     editable.className = 'editable-area';
                     editable.contentEditable = true;
+                    editable.inputMode = "text"; // 모바일 키보드 최적화
                     
                     if (blockIdx === 4 && cellIdx === 4) {
-                        editable.setAttribute('data-placeholder', '최종목표');
+                        editable.setAttribute('data-placeholder', '목표');
                     }
 
                     editable.oninput = (e) => {
                         const val = e.target.innerText;
 
-                        // 중앙 블록에서 외부로 동기화
                         if (blockIdx === 4 && cellIdx !== 4) {
                             syncToOuter(cellIdx, val);
                         }
-                        // 외부 블록 중앙에서 내부로 동기화
                         else if (blockIdx !== 4 && cellIdx === 4) {
                             syncToCenter(blockIdx, val);
+                        }
+                    };
+
+                    // 모바일에서 터치 시 해당 셀로 스크롤 보정
+                    editable.onfocus = (e) => {
+                        if (window.innerWidth < 768) {
+                            setTimeout(() => {
+                                e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 300);
                         }
                     };
 

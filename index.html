@@ -203,12 +203,17 @@ const userMotto = document.getElementById('userMotto');
 // Initialize Mandalart Grid
 function createMandalart() {
     container.innerHTML = ''; 
+    
+    // Core Sub indices to track numbers (1-8, skipping center 4)
+    const getGoalIndex = (index) => {
+        if (index < 4) return index + 1;
+        if (index > 4) return index;
+        return null;
+    };
+
     for (let b = 0; b < 9; b++) {
         const sub = document.createElement('div');
         sub.className = 'sub-grid';
-
-        // Counter for core-sub placeholders (1 to 8)
-        let coreSubCounter = 1;
 
         for (let c = 0; c < 9; c++) {
             const cell = document.createElement('div');
@@ -221,19 +226,23 @@ function createMandalart() {
             edit.className = 'editable-area';
             edit.contentEditable = true;
 
-            // Set specific placeholders for center grid
+            // Placeholder Logic
             if (b === 4) {
+                // Central Grid (The Main Goal and 8 Major Goals)
                 if (c === 4) {
                     edit.dataset.placeholder = '최종 목표';
                 } else {
-                    edit.dataset.placeholder = `목표 ${coreSubCounter++}`;
+                    const goalNum = getGoalIndex(c);
+                    edit.dataset.placeholder = `목표 ${goalNum}`;
                 }
             } else {
-                // For other sub grids
+                // Peripheral Grids (The 8 Detailed Action Plan Grids)
                 if (c === 4) {
-                    edit.dataset.placeholder = '목표 ${coreSubCounter++}';
+                    // Center of a peripheral grid, which mirrors a Major Goal
+                    const goalNum = getGoalIndex(b);
+                    edit.dataset.placeholder = `목표 ${goalNum}`;
                 } else {
-                    // Deleted '입력' placeholder for sub cells
+                    // Action plan cells
                     edit.dataset.placeholder = '';
                 }
             }
